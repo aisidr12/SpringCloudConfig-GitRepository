@@ -27,7 +27,17 @@ public class SubscriptionEntity {
 	private String gender;
 	@Column(name="fecha_cumple",nullable = true)
 	private String birth;
+	@Column(name="noticiasActivated",nullable = true)
+	private String newsLetterActivated;
 	
+	public String getNewsLetterActivated() {
+		return newsLetterActivated;
+	}
+
+	public void setNewsLetterActivated(String newsLetterActivated) {
+		this.newsLetterActivated = newsLetterActivated;
+	}
+
 	@Column(name= "create_at")	
 	@Temporal(TemporalType.TIMESTAMP)
 	private Date createAt;

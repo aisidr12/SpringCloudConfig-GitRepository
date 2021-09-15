@@ -57,15 +57,17 @@ public class SubscriptionServiceImpl implements SubscriptionService {
 	
 	@Override
 	@Transactional
-	public SubscripcionDto createSubscription(SubscripcionDto subscripcionDto) throws SubscriptionInternalError {
-		SubscriptionEntity entity = subscripcionMapper.dtoToEntity(subscripcionDto);
+	public SubscripcionDto createSubscription(SubscripcionDto subscripcionDto) 
+			throws SubscriptionInternalError {
+		SubscriptionEntity entity = new SubscriptionEntity();
 		try {
-			subscriptionDAO.save(entity);
+			entity = subscriptionDAO.save(subscripcionMapper.dtoToEntity(subscripcionDto));
+		} catch (Exception e) {
 			
-		}catch(Exception e) {
-			throw new SubscriptionInternalError("Subscription_002","Subscription fail to persist");
+			throw new SubscriptionInternalError("Subscription_002", "Subscription fail to persist");
 		}
-		return subscripcionDto;
+
+		return subscripcionMapper.entityToDto(entity);
 	}
 
 	@Override
