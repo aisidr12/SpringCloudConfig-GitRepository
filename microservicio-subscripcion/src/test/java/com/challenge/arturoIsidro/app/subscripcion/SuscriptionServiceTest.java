@@ -1,8 +1,6 @@
 package com.challenge.arturoIsidro.app.subscripcion;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -11,8 +9,8 @@ import static org.mockito.Mockito.when;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -60,7 +58,6 @@ class SuscriptionServiceTest {
 	private SubscriptionMapper subscripcionMapper;
 
 	@Test
-	@Disabled
 	void listarSubscriptionSuccess() {
 		SubscriptionView email = new SubscriptionView();
 		SubscripcionDto dto = new SubscripcionDto();
@@ -84,10 +81,10 @@ class SuscriptionServiceTest {
 		dto.setBirthDate(entidad.getBirth());
 		dto.setEmail(entidad.getEmail());
 		dto.setGender(entidad.getGender());
-		dto.setNewsletterActivated(entidad.getNewsLetterActivated());		
+		dto.setNewsletterActivated(entidad.getNewsLetterActivated());
 		return dto;
 	}
-	
+
 	@Test
 	@DisplayName("Error al crear Subscripcion")
 	void creacionSubscrionFail() {
@@ -100,12 +97,13 @@ class SuscriptionServiceTest {
 		entidad.setCreateAt(new Date());
 		SubscripcionDto dto = entityDTO(entidad);
 		when(subscripcionMapper.dtoToEntity(dto)).thenReturn(entidad);
-		//Recuerda que cuando se hace un then throw Mockito da preferencia a la excepcion de la propia api 
+		// Recuerda que cuando se hace un then throw Mockito da preferencia a la
+		// excepcion de la propia api
 		// antes que a la custom Exception que yo he creado.
 		when(subscriptionDAO.save(entidad)).thenThrow(IllegalArgumentException.class);
 		try {
-			
-			SubscripcionDto dtos =	subscrionService.createSubscription(dto);
+
+			SubscripcionDto dtos = subscrionService.createSubscription(dto);
 			assertThrows(IllegalArgumentException.class, () -> {
 				subscripcionMapper.entityToDto(entidad);
 			});
@@ -117,7 +115,6 @@ class SuscriptionServiceTest {
 	}
 
 	@Test
-	@Disabled
 	@DisplayName("Creacion de suscripciones")
 	void creacionSusbcripcionSuccess() {
 		SubscripcionDto dto = new SubscripcionDto();
@@ -134,7 +131,7 @@ class SuscriptionServiceTest {
 			dto2 = subscrionService.createSubscription(dto);
 			assertEquals(dto.getEmail(), dto2.getEmail());
 			assertEquals(dto.getName(), dto2.getName());
-			verify(subscriptionDAO,times(1)).save(entidad);
+			verify(subscriptionDAO, times(1)).save(entidad);
 
 		} catch (SubscriptionInternalError e) {
 			// TODO Auto-generated catch block
@@ -143,7 +140,6 @@ class SuscriptionServiceTest {
 	}
 
 	@Test
-	@Disabled
 	@DisplayName("Buscar suscripcion por Id")
 	void findSubscriptionById() {
 		SubscripcionDto dto = new SubscripcionDto();
@@ -161,6 +157,21 @@ class SuscriptionServiceTest {
 		} catch (SubscriptionNotFound e) {
 			System.out.println(e.getMsgError());
 		}
+	}
+	
+	@Test
+	void findSubscripcionByIdEmpty() {
+		try {
+		// Arrange
+		subscrionService.findSubscriptionById(1L);
+		Optional<SubscriptionEntity> optionalEntidad = Optional.empty();
+		// Act
+		when(subscriptionDAO.findById(1L)).thenReturn(optionalEntidad);
+		// Assert		
+		} catch (SubscriptionNotFound e) {
+			assertEquals("Subscription_001", e.getCodError());
+		}
+
 	}
 
 }
